@@ -21,5 +21,4 @@ A simple console-based task management application built with Java and Spring Bo
 ## Future Improvements
 
 - [ ] Add Unit Tests with JUnit & Mockito.
-- [ ] Convert to a REST API architecture.
 
