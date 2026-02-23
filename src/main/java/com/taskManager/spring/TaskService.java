@@ -16,9 +16,10 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public void addTask(String taskName){
+    public Task addTask(String taskName){
         Task task = new Task(taskName, Task.Status.TODO);
-        taskRepository.save(task);
+        return taskRepository.save(task);
+        
     }
 
     public boolean deleteTask(int id){
@@ -34,6 +35,7 @@ public class TaskService {
     public List<Task> getAllTasks(){
         return taskRepository.findAll();
     }
+    
     @Transactional 
     public boolean markTask(int id){
         Optional<Task> task = taskRepository.findById(id);

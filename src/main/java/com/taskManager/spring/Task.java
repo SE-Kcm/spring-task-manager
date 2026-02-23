@@ -23,6 +23,10 @@ public class Task {
         this.name = name;
         this.status = status;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     
     public void setName(String name){
         this.name = name;
@@ -31,6 +35,7 @@ public class Task {
     public void setStatus(Status status) {
         this.status = status;
     }
+
 
     public int getId() {
         return id;

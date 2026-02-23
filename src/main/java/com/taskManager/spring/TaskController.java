@@ -1,7 +1,7 @@
 package com.taskManager.spring;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,44 +21,50 @@ public class TaskController{
         this.taskService = taskService;
     }
     @PostMapping(value="/tasks")
-    public ResponseEntity<String> addTask(@RequestBody Map<String, String> body){
-        String taskName = body.get("name");
-        if(taskName != null && !taskName.isEmpty()){
-            taskService.addTask(taskName);
-            return ResponseEntity.ok("Task added successfully!");
+    public ResponseEntity<AddTaskResponseDTO> addTask(@RequestBody AddTaskRequestDTO body){
+        String taskName = body.getName();
+        if(taskName != null && !taskName.trim().isEmpty()){
+            Task task = taskService.addTask(taskName);
+            return ResponseEntity.ok(new AddTaskResponseDTO(taskName, task.getId(), task.getStatus(), "Task added successfully!"));
         }else{
-            return ResponseEntity.badRequest().build();
+            //return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(400).body(new AddTaskResponseDTO("Invalid input!"));
         }
     }
 
+    // Convert Task entities to TaskDTOs to safely expose only id, name, and status in a frontend-ready JSON
     @GetMapping(value="/tasks")
-    public ResponseEntity<List<Task>> listAllTasks(){
+    public ResponseEntity<List<TaskDTO>> listAllTasks(){
         List<Task> resList =  taskService.getAllTasks(); 
+        List<TaskDTO> dtoList = new LinkedList<TaskDTO>();
         if(resList.isEmpty()){
             return ResponseEntity.noContent().build();
         }else{
-            return ResponseEntity.ok(resList);
+            for(Task t : resList){
+                dtoList.add(new TaskDTO(t.getName(),t.getId(),t.getStatus()));
+            }
+            return ResponseEntity.ok(dtoList);
         }
         
     }
-
+    
     @PutMapping(value="/tasks/{id}/done")
-    public ResponseEntity<String> markTask(@PathVariable int id){
+    public ResponseEntity<MessageResponseDTO> markTask(@PathVariable int id){
         boolean resVal = taskService.markTask(id);
         if(resVal){
-            return ResponseEntity.ok("Task marked as DONE!");
+            return ResponseEntity.status(200).body(new MessageResponseDTO("Task marked as DONE!"));
         }else{
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new MessageResponseDTO("Task could not be found!"));
         }
     }
 
     @DeleteMapping(value="/tasks/{id}")
-    public ResponseEntity<String> deleteTask(@PathVariable int id){
+    public ResponseEntity<MessageResponseDTO> deleteTask(@PathVariable int id){
         boolean resVal = taskService.deleteTask(id);
         if(resVal){
-            return ResponseEntity.ok("Task deleted successfully!");
+            return ResponseEntity.status(200).body(new MessageResponseDTO("Task deleted successfully!"));
         }else{
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new MessageResponseDTO("Task could not be found!"));
         }
     }
 
