@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,7 +20,7 @@ public class TaskController{
     public TaskController(TaskService taskService) { 
         this.taskService = taskService;
     }
-    @RequestMapping(value="/tasks", method=RequestMethod.POST)
+    @PostMapping(value="/tasks")
     public ResponseEntity<String> addTask(@RequestBody Map<String, String> body){
         String taskName = body.get("name");
         if(taskName != null && !taskName.isEmpty()){
@@ -29,7 +31,7 @@ public class TaskController{
         }
     }
 
-    @RequestMapping(value="/tasks", method=RequestMethod.GET)
+    @GetMapping(value="/tasks")
     public ResponseEntity<List<Task>> listAllTasks(){
         List<Task> resList =  taskService.getAllTasks(); 
         if(resList.isEmpty()){
@@ -40,7 +42,7 @@ public class TaskController{
         
     }
 
-    @RequestMapping(value="/tasks/{id}/done", method=RequestMethod.PUT)
+    @PutMapping(value="/tasks/{id}/done")
     public ResponseEntity<String> markTask(@PathVariable int id){
         boolean resVal = taskService.markTask(id);
         if(resVal){
@@ -50,7 +52,7 @@ public class TaskController{
         }
     }
 
-    @RequestMapping(value="/tasks/{id}", method=RequestMethod.DELETE)
+    @DeleteMapping(value="/tasks/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable int id){
         boolean resVal = taskService.deleteTask(id);
         if(resVal){
