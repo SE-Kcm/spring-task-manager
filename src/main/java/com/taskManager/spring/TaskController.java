@@ -19,11 +19,11 @@ public class TaskController{
         this.taskService = taskService;
     }
     @RequestMapping(value="/tasks", method=RequestMethod.POST)
-    public ResponseEntity<Void> addTask(@RequestBody Map<String, String> body){
+    public ResponseEntity<String> addTask(@RequestBody Map<String, String> body){
         String taskName = body.get("name");
-        if(!taskName.isEmpty() && taskName != null){
+        if(taskName != null && !taskName.isEmpty()){
             taskService.addTask(taskName);
-            return ResponseEntity.ok().build(); //need build because there is no response body (build: Build the response entity with no body.)
+            return ResponseEntity.ok("Task added successfully!");
         }else{
             return ResponseEntity.badRequest().build();
         }
@@ -41,20 +41,20 @@ public class TaskController{
     }
 
     @RequestMapping(value="/tasks/{id}/done", method=RequestMethod.PUT)
-    public ResponseEntity<Void> markTask(@PathVariable int id){
+    public ResponseEntity<String> markTask(@PathVariable int id){
         boolean resVal = taskService.markTask(id);
         if(resVal){
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Task marked as DONE!");
         }else{
             return ResponseEntity.notFound().build();
         }
     }
 
     @RequestMapping(value="/tasks/{id}", method=RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteTask(@PathVariable int id){
+    public ResponseEntity<String> deleteTask(@PathVariable int id){
         boolean resVal = taskService.deleteTask(id);
         if(resVal){
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Task deleted successfully!");
         }else{
             return ResponseEntity.notFound().build();
         }
