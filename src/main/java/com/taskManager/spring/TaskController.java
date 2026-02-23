@@ -27,7 +27,6 @@ public class TaskController{
             Task task = taskService.addTask(taskName);
             return ResponseEntity.ok(new AddTaskResponseDTO(taskName, task.getId(), task.getStatus(), "Task added successfully!"));
         }else{
-            //return ResponseEntity.badRequest().build();
             return ResponseEntity.status(400).body(new AddTaskResponseDTO("Invalid input!"));
         }
     }
