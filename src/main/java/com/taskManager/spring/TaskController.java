@@ -49,22 +49,16 @@ public class TaskController{
     
     @PutMapping(value="/tasks/{id}/done")
     public ResponseEntity<MessageResponseDTO> markTask(@PathVariable int id){
-        boolean resVal = taskService.markTask(id);
-        if(resVal){
-            return ResponseEntity.status(200).body(new MessageResponseDTO("Task marked as DONE!"));
-        }else{
-            return ResponseEntity.status(404).body(new MessageResponseDTO("Task could not be found!"));
-        }
+        taskService.markTask(id); //if id is not found, the GlobalExceptionHandler takes care of it.
+        return ResponseEntity.status(200).body(new MessageResponseDTO("Task marked as DONE!"));
+
     }
 
     @DeleteMapping(value="/tasks/{id}")
     public ResponseEntity<MessageResponseDTO> deleteTask(@PathVariable int id){
-        boolean resVal = taskService.deleteTask(id);
-        if(resVal){
-            return ResponseEntity.status(200).body(new MessageResponseDTO("Task deleted successfully!"));
-        }else{
-            return ResponseEntity.status(404).body(new MessageResponseDTO("Task could not be found!"));
-        }
+        taskService.deleteTask(id);
+        return ResponseEntity.status(200).body(new MessageResponseDTO("Task deleted successfully!"));
+       
     }
 
 }

@@ -1,5 +1,6 @@
 package com.taskManager.spring;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
@@ -112,8 +113,6 @@ public class TaskControllerTest {
     public void markTask_success() throws Exception{
         int id = 1;
 
-        when(taskService.markTask(id)).thenReturn(true);
-
         mockMvc.perform(put("/tasks/{id}/done",id)) //we have to tell MockMvc what the value for {id} is
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON)) 
@@ -122,20 +121,18 @@ public class TaskControllerTest {
 
        @Test
     public void markTask_failure() throws Exception{
-        int id = 1;
-        when(taskService.markTask(id)).thenReturn(false);
+        int id = 99;
+        doThrow(new TaskNotFoundException(id)).when(taskService).markTask(id);
 
         mockMvc.perform(put("/tasks/{id}/done",id)) 
             .andExpect(status().isNotFound())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON)) 
-            .andExpect(jsonPath("$.message").value("Task could not be found!"));
+            .andExpect(jsonPath("$.message").value("Task with ID 99 could not be found!"));
     }
 
         @Test
     public void deleteTask_success() throws Exception{
         int id = 1;
-
-        when(taskService.deleteTask(id)).thenReturn(true);
 
         mockMvc.perform(delete("/tasks/{id}",id))
             .andExpect(status().isOk())
@@ -145,13 +142,13 @@ public class TaskControllerTest {
 
        @Test
     public void deleteTask_failure() throws Exception{
-        int id = 1;
-        when(taskService.deleteTask(id)).thenReturn(false);
+        int id = 99;
+        doThrow(new TaskNotFoundException(id)).when(taskService).deleteTask(id);
 
         mockMvc.perform(delete("/tasks/{id}",id)) 
             .andExpect(status().isNotFound())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON)) 
-            .andExpect(jsonPath("$.message").value("Task could not be found!"));
+            .andExpect(jsonPath("$.message").value("Task with ID 99 could not be found!"));
     }
 
 

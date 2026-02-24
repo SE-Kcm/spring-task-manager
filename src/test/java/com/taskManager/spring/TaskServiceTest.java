@@ -7,9 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -89,11 +88,9 @@ public class TaskServiceTest {
         int id = 1;
         mockTask.setId(id);
 
-         when(taskRepository.findById(id)).thenReturn(Optional.of(mockTask));
+        when(taskRepository.findById(id)).thenReturn(Optional.of(mockTask));
 
-         boolean res = taskService.deleteTask(id);
-
-         assertTrue(res);
+        taskService.deleteTask(id);
 
     }
 
@@ -103,9 +100,7 @@ public class TaskServiceTest {
 
         when(taskRepository.findById(id)).thenReturn(Optional.empty());
 
-        boolean res = taskService.deleteTask(id);
-
-        assertFalse(res);
+        assertThrows(TaskNotFoundException.class,() -> taskService.deleteTask(id));
 
     }
 
@@ -117,10 +112,9 @@ public class TaskServiceTest {
         
         when(taskRepository.findById(id)).thenReturn(Optional.of(mockTask));
 
-        boolean res = taskService.markTask(id);
+        taskService.markTask(id);
         
         assertEquals(Task.Status.DONE, mockTask.getStatus());
-        assertTrue(res);
     }
 
         @Test
@@ -129,9 +123,9 @@ public class TaskServiceTest {
         
         when(taskRepository.findById(id)).thenReturn(Optional.empty());
 
-        boolean res = taskService.markTask(id);
+        assertThrows(TaskNotFoundException.class,() -> taskService.markTask(id));
         
-        assertFalse(res);
+        
     }
 
 }
