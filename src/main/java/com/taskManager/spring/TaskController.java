@@ -1,95 +1,64 @@
 package com.taskManager.spring;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-public class TaskController implements CommandLineRunner{
+@RestController
+public class TaskController{
 
     TaskService taskService;
     
     public TaskController(TaskService taskService) { 
         this.taskService = taskService;
     }
+    @PostMapping(value="/tasks")
+    public ResponseEntity<AddTaskResponseDTO> addTask(@RequestBody AddTaskRequestDTO body){
+        String taskName = body.getName();
+        if(taskName != null && !taskName.trim().isEmpty()){
+            Task task = taskService.addTask(taskName);
+            return ResponseEntity.ok(new AddTaskResponseDTO(taskName, task.getId(), task.getStatus(), "Task added successfully!"));
+        }else{
+            return ResponseEntity.status(400).body(new AddTaskResponseDTO("Invalid input!"));
+        }
+    }
 
-
-    public void start(){
-        Scanner scanner = new Scanner(System.in);
+    // Convert Task entities to TaskDTOs to safely expose only id, name, and status in a frontend-ready JSON
+    @GetMapping(value="/tasks")
+    public ResponseEntity<List<TaskDTO>> listAllTasks(){
+        List<Task> resList =  taskService.getAllTasks(); 
+        List<TaskDTO> dtoList = new LinkedList<TaskDTO>();
+        if(resList.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }else{
+            for(Task t : resList){
+                dtoList.add(new TaskDTO(t.getName(),t.getId(),t.getStatus()));
+            }
+            return ResponseEntity.ok(dtoList);
+        }
+        
+    }
     
-        while(true){
-            System.out.println("----------Task Manager----------");
-            System.out.println("1 - Add Task\n" + //
-                        "2 - List Tasks\n" + //
-                        "3 - Mark Task as Done\n" + //
-                        "4 - Delete Task\n" + //
-                        "5 - Exit");
-            System.out.println("Enter an option:");
-            String userInput = scanner.nextLine();
+    @PutMapping(value="/tasks/{id}/done")
+    public ResponseEntity<MessageResponseDTO> markTask(@PathVariable int id){
+        taskService.markTask(id); //if id is not found, the GlobalExceptionHandler takes care of it.
+        return ResponseEntity.status(200).body(new MessageResponseDTO("Task marked as DONE!"));
 
-            if(userInput.equals("1")){
-                System.out.println("Enter Task name:");
-                String taskName = scanner.nextLine();
-                taskService.addTask(taskName);
-                System.out.println("New Task was added successfully.");
-            } else if (userInput.equals("2")){
-                List<Task> tasks = taskService.getAllTasks();
-                if(tasks.isEmpty()){
-                     System.out.println("No tasks found!");
-                }else{
-                    for(Task t : tasks){
-                        System.out.println(t.getId() + " - " + t.getName() + " - " + t.getStatus());
-                    }
-                }
-            }else if (userInput.equals("3")){
-                System.out.println("Please enter the ID of the task you want to mark as DONE.");
-                int taskId = readInt(scanner);
-                while(taskId < 0){
-                    System.out.println("The id must be positive!");
-                    taskId = readInt(scanner);
-                } 
-                if(taskService.markTask(taskId)){
-                    System.out.println("Task marked successfully!");
-                }else{
-                    System.out.println("Task not found!"); 
-                }
-            }else if (userInput.equals("4")){
-                System.out.println("Please enter the ID of the task you want to delete.");
-                int taskId = readInt(scanner);
-                while(taskId < 0){
-                    System.out.println("The id must be positive!");
-                    taskId = readInt(scanner);
-                }
-                if(taskService.deleteTask(taskId)){
-                    System.out.println("Task deleted successfully!");
-                }else{
-                    System.out.println("Task not found!"); 
-                }
-                
-            }else if (userInput.equals("5")){
-                System.exit(0);
-            }else{
-                System.out.println("Invalid input. Please enter valid option:");
-            }
-        }  
     }
 
-
-        public int readInt(Scanner scanner){
-        while(true){
-            try {
-                return Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a number!");
-            }
-        }
+    @DeleteMapping(value="/tasks/{id}")
+    public ResponseEntity<MessageResponseDTO> deleteTask(@PathVariable int id){
+        taskService.deleteTask(id);
+        return ResponseEntity.status(200).body(new MessageResponseDTO("Task deleted successfully!"));
+       
     }
-
-
-        public void run(String... args) throws Exception { 
-            start();
-        }
 
 }
