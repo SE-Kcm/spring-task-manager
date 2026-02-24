@@ -21,5 +21,6 @@ A RESTful Task Management API built with Java and Spring Boot, featuring a robus
 - **RESTful API Design:** Implementing standard HTTP methods (GET, POST, PUT, DELETE) with appropriate status codes (200, 204, 400, 404).
 - **Enum Mapping:** Using `@Enumerated(EnumType.STRING)` for future-proof status handling
 - **Comprehensive Testing:** Unit and Web-Layer testing using Mockito, MockMvc, and JsonPath.
+- **Global Exception Handling:** Centralized error management via @ControllerAdvice for consistent API feedback.
 
 
